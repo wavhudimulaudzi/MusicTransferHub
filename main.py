@@ -6,14 +6,14 @@ import os
 import re
 import random
 import string
+from decouple import config
 
 app = Flask(__name__)
 
-client_id = 'a534b97e062943c5913256751ee1dc53'
-client_secret = '367dfdec7d034970b10e227ac8bc90e8'
 redirect_uri = 'http://localhost:8888/callback'
-state_key = 'guOGHdoAqe8FBXWB'
-
+CLIENT_ID = config('CLIENT_ID')
+CLIENT_SECRET = config('CLIENT_SECRET')
+STATE_KEY = config('STATE_KEY')
 
 # state_key = 'spotify_auth_state'
 
@@ -30,8 +30,8 @@ def index():
 def login():
     state = generate_random_string(16)
     resp = make_response(redirect('https://accounts.spotify.com/authorize?' +
-                                  f'response_type=code&client_id={client_id}&scope=user-read-private%20user-read-email&redirect_uri={redirect_uri}&state={state}'))
-    resp.set_cookie(state_key, state)
+                                  f'response_type=code&client_id={CLIENT_ID}&scope=user-read-private%20user-read-email&redirect_uri={redirect_uri}&state={state}'))
+    resp.set_cookie(STATE_KEY, state)
     return resp
 
 
@@ -40,13 +40,13 @@ def callback():
     global filtered_profile_date
     code = request.args.get('code', None)
     state = request.args.get('state', None)
-    stored_state = request.cookies.get(state_key)
+    stored_state = request.cookies.get(STATE_KEY)
 
     if state is None or state != stored_state:
         return redirect('/#' + json.dumps({'error': 'state_mismatch'}))
     else:
         resp = make_response(redirect('/#'))
-        resp.delete_cookie(state_key)
+        resp.delete_cookie(STATE_KEY)
 
         auth_options = {
             'url': 'https://accounts.spotify.com/api/token',
@@ -57,7 +57,7 @@ def callback():
             },
             'headers': {
                 'content-type': 'application/x-www-form-urlencoded',
-                'Authorization': 'Basic ' + base64.b64encode(f'{client_id}:{client_secret}'.encode()).decode('utf-8')
+                'Authorization': 'Basic ' + base64.b64encode(f'{CLIENT_ID}:{CLIENT_SECRET}'.encode()).decode('utf-8')
             }
         }
 
