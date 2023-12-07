@@ -94,7 +94,6 @@ def user_id_extractor(spotify_uri: str):
 @app.route('/spotify/getPlaylistsForUser', methods=['GET', 'POST'])
 def getPlaylistsUser():
     if request.method == 'GET':
-
         options = {
             'url': 'https://api.spotify.com/v1/users/' + user_id_extractor(spotify.get_profile_data().get('uri')) + '/playlists',
             'headers': {'Authorization': 'Bearer ' + spotify.get_access_token()}
@@ -105,22 +104,65 @@ def getPlaylistsUser():
 
         playlist_data = summarise_playlist(playlist_list)
 
+        spotify.set_playlist_data(playlist_data)
+
+        tracks = get_playlist_tracks(spotify.get_playlist_data())
+
+        print(tracks)
+
         return render_template('home.html', playlist_data=playlist_data)
 
+
 # [
-# {
-#   name: slow Jam,
-#   tracks: {'href': 'https://api.spotify.com/v1/playlists/0hMbFKJ5oCamJ4EKr6usGY/tracks', 'total': 3}
-# },
-# {
-#   name: One of Those days,
-#   tracks: {'href': 'https://api.spotify.com/v1/playlists/5HAZhbBDRqjgC2KLEAGVFK/tracks', 'total': 11}
-# },
-# {
-#   name: gospel,
-#   tracks: {'href': 'https://api.spotify.com/v1/playlists/0OMFEc34XGQ2l63bSlaR7i/tracks', 'total': 3}
-# }
+#   {
+#       playlist_name: slow Jam,
+#       tracks: [
+#
+#       ]
+#   }
 # ]
+
+def get_playlist_tracks(playlist_data):
+    playlists_tracks_details = []
+    for playlist in playlist_data:
+        playlist_name = playlist['name']
+        href_value = playlist['tracks']['href']
+
+        options = {
+            'url': href_value,
+            'headers': {'Authorization': 'Bearer ' + spotify.get_access_token()}
+        }
+
+        response = requests.get(**options)
+        tracks = response.json().get('items')
+
+        playlist_tracks = []
+
+        for track in tracks:
+            track_name = track.get("track", {}).get("name")
+
+            if track_name:
+                artists_list = []
+                artists = track.get("track", {}).get("artists")
+                for artist in artists:
+                    artist_name = artist.get("name")
+                    if artist_name:
+                        artists_list.append(artist_name)
+
+                temp = {
+                    'track_name': track_name,
+                    'artists': artists_list
+                }
+                playlist_tracks.append(temp)
+
+        temp = {
+            "playlist_name": playlist_name,
+            "tracks": playlist_tracks
+        }
+        playlists_tracks_details.append(temp)
+
+    return playlists_tracks_details
+
 
 def summarise_playlist(playlist_list):
     summarised = []
@@ -133,7 +175,6 @@ def summarise_playlist(playlist_list):
         summarised.append(playlist_dic)
 
     return summarised
-
 
 
 if __name__ == '__main__':
