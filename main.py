@@ -5,6 +5,9 @@ import json
 import os
 import re
 from spotify import Spotify
+from typing import Dict
+from decouple import config
+from requests.exceptions import RequestException
 
 app = Flask(__name__)
 spotify = Spotify()
@@ -13,6 +16,128 @@ redirect_uri = 'http://localhost:8888/callback'
 
 
 # state_key = 'spotify_auth_state'
+
+# Define the GoogleOauthToken interface
+class GoogleOauthToken:
+    def __init__(self, access_token: str, id_token: str, expires_in: int,
+                 refresh_token: str, token_type: str, scope: str):
+        self.access_token = access_token
+        self.id_token = id_token
+        self.expires_in = expires_in
+        self.refresh_token = refresh_token
+        self.token_type = token_type
+        self.scope = scope
+
+
+def get_google_oauth_token(code: str) -> GoogleOauthToken:
+    root_url = 'https://oauth2.googleapis.com/token'
+
+    options = {
+        'code': code,
+        'client_id': config('GOOGLECLIENTID'),
+        'client_secret': config('GOOGLECLIENTSECRET'),
+        'redirect_uri': config('GOOGLEOAUTHREDIRECT'),
+        'grant_type': 'authorization_code',
+    }
+
+    try:
+        response = requests.post(root_url, data=options, headers={
+            'Content-Type': 'application/x-www-form-urlencoded'
+        })
+        response.raise_for_status()  # Raise an HTTPError for bad responses
+
+        data = response.json()
+        return GoogleOauthToken(**data)
+
+    except requests.exceptions.RequestException as e:
+        print('Failed to fetch Google Oauth Tokens')
+        raise e
+
+
+# Define the GoogleUserResult interface
+class GoogleUserResult:
+    def __init__(self, id: str, email: str, verified_email: bool, name: str,
+                 given_name: str, family_name: str, picture: str, locale: str):
+        self.id = id
+        self.email = email
+        self.verified_email = verified_email
+        self.name = name
+        self.given_name = given_name
+        self.family_name = family_name
+        self.picture = picture
+        self.locale = locale
+
+
+def get_google_user(id_token: str, access_token: str) -> GoogleUserResult:
+    try:
+        response = requests.get(
+            f'https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token={access_token}',
+            headers={'Authorization': f'Bearer {id_token}'}
+        )
+        response.raise_for_status()  # Raise an HTTPError for bad responses
+
+        data = response.json()
+        return GoogleUserResult(**data)
+
+    except requests.exceptions.RequestException as e:
+        print(e)
+        raise e
+
+
+@app.route('/api/sessions/oauth/google')
+def google_oauth_handler():
+    try:
+        # Get the code from the query
+        code = request.args.get('code')
+        path_url = request.args.get('state', '/')
+
+        if not code:
+            return make_response(('Authorization code not provided!', 401))
+
+        # Use the code to get the id and access tokens
+        google_oauth_token = get_google_oauth_token(code)
+
+        # Use the token to get the User
+        google_user = get_google_user(google_oauth_token.id_token, google_oauth_token.access_token)
+
+        print(google_user.email)
+        print(google_user.verified_email)
+        print(google_user.name)
+        # Check if the user is verified
+        if not google_user.verified_email:
+            return make_response(('Google account not verified', 403))
+
+        # Update user if user already exists or create a new user
+        # user = find_and_update_user(
+        #     {'email': google_user['email']},
+        #     {
+        #         'name': google_user['name'],
+        #         'photo': google_user['picture'],
+        #         'email': google_user['email'],
+        #         'provider': 'Google',
+        #         'verified': True,
+        #     },
+        #     {'upsert': True, 'runValidators': False, 'new': True, 'lean': True}
+        # )
+
+        # if not user:
+        #     return redirect(f'{config.get("origin")}/oauth/error')
+
+        # Create access and refresh token
+        # access_token, refresh_token = sign_token(user)
+
+        # Send cookies
+        response = make_response(redirect(f'{config("ORIGIN")}{path_url}'))
+        # response.set_cookie('refresh-token', refresh_token, **refreshTokenCookieOptions)
+        # response.set_cookie('access-token', access_token, **accessTokenCookieOptions)
+        # response.set_cookie('logged_in', 'true', expires=(datetime.now() + timedelta(
+        #     minutes=config.get('accessTokenExpiresIn'))))
+        return response
+
+    except RequestException as e:
+        print(f'Failed to authorize Google User: {e}')
+        return redirect(f'{config.get("origin")}/oauth/error')
+
 
 @app.route('/')
 def index():

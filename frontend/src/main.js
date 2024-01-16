@@ -4,4 +4,6 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from "@/router/index.js";
 
-createApp(App).use(router).mount('#app')
+// Initialize the Google Sign-In API
+const app = createApp(App);
+app.use(router).mount('#app')
