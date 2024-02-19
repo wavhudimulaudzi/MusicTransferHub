@@ -24,8 +24,7 @@
 <style scoped>
 
 nav {
-  background-color: #ffffff;
-  padding: 15px;
+  padding: 15px 90px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -45,13 +44,13 @@ li {
 
 a {
   text-decoration: none;
-  color: #333;
+  color: #FFFFFF;
   font-size: 22px;
   font-weight: 600;
 }
 
 #login {
-  background-color: #000;
+  background-color: #000000;
   border-radius: 12px;
 
 }

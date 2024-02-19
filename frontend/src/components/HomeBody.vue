@@ -69,14 +69,18 @@ h3 {
   height: 53px;
   flex-shrink: 0;
   border-radius: 15px;
-  background: rgba(255, 255, 255, 0.50);
+  background: #737373;
   padding: 0 8px;
 
-  color: #000000;
+  color: #DDD;
   font-size: 20px;
   font-style: normal;
   font-weight: 700;
   line-height: normal;
+}
+
+#email[type=email]::placeholder {
+  color: #999;
 }
 
 #notifyMe {
