@@ -3,12 +3,13 @@ import Home from "@/views/Home.vue";
 import LoginForm from "@/views/LoginForm.vue";
 import DonationView from "@/views/DonationView.vue";
 import TermsOfUseView from "@/views/TermsOfUseView.vue";
+import Callback from "@/components/Callback.vue";
 
 const routes = [
     {
         path: '/',
         name: 'home',
-        component: Home
+        component: Home,
     },
     {
         path: '/login',
@@ -24,6 +25,11 @@ const routes = [
         path: '/termsofuse',
         name: 'termsofuse',
         component: TermsOfUseView
+    },
+    {
+        path: '/callback',
+        name: 'callback',
+        component: Callback
     },
 ]
 

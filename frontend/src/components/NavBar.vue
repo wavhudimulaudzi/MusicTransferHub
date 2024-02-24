@@ -1,5 +1,12 @@
 <script setup>
 
+const props =  defineProps({
+  code: {
+    type: String,
+    default: null
+  }
+})
+
 </script>
 
 <template>
@@ -8,7 +15,7 @@
     <img src="../assets/logo.svg" alt="playlistTransfer logo"/>
   </div>
   <ul>
-    <li id="login" key="login">
+    <li id="login" key="login" v-if="code === null">
       <router-link to="login">Login</router-link>
     </li>
     <li id="buyMeCoffee" key="buyMeCoffee">

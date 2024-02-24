@@ -1,11 +1,12 @@
 <script setup>
+import { onMounted } from 'vue'
 import { getGoogleUrl } from '../utils/getGoogleUrl';
-import {loginToSpotify} from "@/utils/spotifyUtils.js";
+import {redirectToAuthCodeFlow} from "@/utils/spotifyUtils.js";
 
-function test() {
-  loginToSpotify()
-}
-
+// const props = defineProps({
+//   clientId: String
+// });
+const clientId = "a534b97e062943c5913256751ee1dc53";
 const from = '/';
 </script>
 
@@ -14,7 +15,7 @@ const from = '/';
     <div class="loginFormSubContainer">
       <h1>Sign in</h1>
       <div class="otherThirdPartySigningServices">
-        <a v-on:click="test" data-servicename="spotify" title="Sign in with spotify" class="btn btn-spotify">
+        <a @click="redirectToAuthCodeFlow(clientId)" data-servicename="spotify" title="Sign in with spotify" class="btn btn-spotify">
           <i class="bi bi-spotify"></i>
           <span class="name">Sign in with Spotify</span>
         </a>
@@ -23,7 +24,6 @@ const from = '/';
           <span class="name">Sign in with Apple Music</span>
         </a>
         <a :href="getGoogleUrl(from)" data-servicename="tidal" title="Sign in with Tidal" class="btn btn-tidal">
-<!--          <i class="bi bi-facebook"></i>-->
           <img src="../assets/icons8-tidal-50.png" alt="Tidal icon" width="25px" height="25px"/>
           <span class="name">Sign in with Tidal</span>
         </a>
