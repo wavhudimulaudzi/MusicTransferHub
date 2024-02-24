@@ -2,16 +2,16 @@ const clientId = "a534b97e062943c5913256751ee1dc53";
 const params = new URLSearchParams(window.location.search);
 const code = params.get("code");
 
-export async function loginToSpotify() {
-    if (!code) {
-        await redirectToAuthCodeFlow(clientId);
-    } else {
-        const accessToken = await getAccessToken(clientId, code);
-        const profile = await fetchProfile(accessToken);
-        console.log(profile)
-        // populateUI(profile);
-    }
-}
+// export async function loginToSpotify() {
+//     if (!code) {
+//         await redirectToAuthCodeFlow(clientId);
+//     } else {
+//         const accessToken = await getAccessToken(clientId, code);
+//         const profile = await fetchProfile(accessToken);
+//         console.log(profile)
+//         // populateUI(profile);
+//     }
+// }
 
 export async function redirectToAuthCodeFlow(clientId) {
     const verifier = generateCodeVerifier(128);
@@ -22,7 +22,7 @@ export async function redirectToAuthCodeFlow(clientId) {
     const params = new URLSearchParams();
     params.append("client_id", clientId);
     params.append("response_type", "code");
-    params.append("redirect_uri", "http://localhost:5173/");
+    params.append("redirect_uri", "http://localhost:5173/callback");
     params.append("scope", "user-read-private user-read-email");
     params.append("code_challenge_method", "S256");
     params.append("code_challenge", challenge);
@@ -56,7 +56,7 @@ export async function getAccessToken(clientId, code) {
     params.append("client_id", clientId);
     params.append("grant_type", "authorization_code");
     params.append("code", code);
-    params.append("redirect_uri", "http://localhost:5173/");
+    params.append("redirect_uri", "http://localhost:5173/callback");
     params.append("code_verifier", verifier);
 
     const result = await fetch("https://accounts.spotify.com/api/token", {

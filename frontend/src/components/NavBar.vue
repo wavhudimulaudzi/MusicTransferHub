@@ -1,12 +1,7 @@
 <script setup>
+import {useApiDataStore} from "@/utils/globalAppStates.js";
 
-const props =  defineProps({
-  code: {
-    type: String,
-    default: null
-  }
-})
-
+const dataStore = useApiDataStore();
 </script>
 
 <template>
@@ -15,7 +10,7 @@ const props =  defineProps({
     <img src="../assets/logo.svg" alt="playlistTransfer logo"/>
   </div>
   <ul>
-    <li id="login" key="login" v-if="code === null">
+    <li id="login" key="login" v-if="dataStore.getSpotifyAccessToken === null">
       <router-link to="login">Login</router-link>
     </li>
     <li id="buyMeCoffee" key="buyMeCoffee">
