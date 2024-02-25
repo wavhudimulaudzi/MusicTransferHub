@@ -1,11 +1,5 @@
 <script setup>
-import {useApiDataStore} from "@/utils/globalAppStates.js";
 import ProfileCard from "@/components/ProfileCard.vue";
-import {onBeforeMount, onMounted} from "vue";
-import {fetchProfile} from "@/utils/spotifyUtils.js";
-
-// const dataStore = useApiDataStore();
-
 
 const props = defineProps({
   accessToken: {
