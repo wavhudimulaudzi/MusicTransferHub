@@ -1,7 +1,20 @@
 <script setup>
 import {useApiDataStore} from "@/utils/globalAppStates.js";
+import ProfileCard from "@/components/ProfileCard.vue";
+import {onMounted} from "vue";
+import {fetchProfile} from "@/utils/spotifyUtils.js";
 
 const dataStore = useApiDataStore();
+const accessToken = dataStore.getSpotifyAccessToken;
+var profileData = null;
+
+onMounted(async () => {
+
+  if (accessToken !== null) {
+    profileData = await fetchProfile(accessToken);
+    console.log(profileData)
+  }
+})
 </script>
 
 <template>
@@ -9,8 +22,8 @@ const dataStore = useApiDataStore();
   <div>
     <img src="../assets/logo.svg" alt="playlistTransfer logo"/>
   </div>
-  <ul>
-    <li id="login" key="login" v-if="dataStore.getSpotifyAccessToken === null">
+  <ul v-if="accessToken === null">
+    <li id="login" key="login">
       <router-link to="login">Login</router-link>
     </li>
     <li id="buyMeCoffee" key="buyMeCoffee">
@@ -20,6 +33,13 @@ const dataStore = useApiDataStore();
       <router-link to="termsofuse">Terms of Use</router-link>
     </li>
   </ul>
+  <ProfileCard
+      v-if="accessToken !== null"
+      :profile-image-url="profileData.images[1].url"
+      :user-full-name="profileData.display_name"
+      platform-name="Spotify" platform-class="spotify"
+      :user-email-address="profileData.email"
+  />
 </nav>
 </template>
 

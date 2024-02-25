@@ -1,11 +1,8 @@
 <script setup>
-import { onMounted } from 'vue'
 import { getGoogleUrl } from '../utils/getGoogleUrl';
 import {redirectToAuthCodeFlow} from "@/utils/spotifyUtils.js";
 
-// const props = defineProps({
-//   clientId: String
-// });
+
 const clientId = "a534b97e062943c5913256751ee1dc53";
 const from = '/';
 </script>
