@@ -1,19 +1,18 @@
 <script setup>
 import {useApiDataStore} from "@/utils/globalAppStates.js";
 import ProfileCard from "@/components/ProfileCard.vue";
-import {onMounted} from "vue";
+import {onBeforeMount, onMounted} from "vue";
 import {fetchProfile} from "@/utils/spotifyUtils.js";
 
-const dataStore = useApiDataStore();
-const accessToken = dataStore.getSpotifyAccessToken;
-var profileData = null;
+// const dataStore = useApiDataStore();
 
-onMounted(async () => {
 
-  if (accessToken !== null) {
-    profileData = await fetchProfile(accessToken);
-    console.log(profileData)
-  }
+const props = defineProps({
+  accessToken: {
+    type: String,
+    default: null
+  },
+  profileData: Object
 })
 </script>
 
@@ -34,7 +33,7 @@ onMounted(async () => {
     </li>
   </ul>
   <ProfileCard
-      v-if="accessToken !== null"
+      v-if="profileData !== null"
       :profile-image-url="profileData.images[1].url"
       :user-full-name="profileData.display_name"
       platform-name="Spotify" platform-class="spotify"

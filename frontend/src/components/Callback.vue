@@ -17,6 +17,7 @@ onMounted(async () => {
 
     try {
       dataStore.setSpotifyAccessToken(accessToken);
+      dataStore.setSpotifyCode(code)
     } catch (error) {
       console.error('Error setting Spotify access token:', error);
     }
