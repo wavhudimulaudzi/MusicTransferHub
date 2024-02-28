@@ -89,6 +89,7 @@ function summarisePlaylistData(playlistData) {
 
         playlistDic['name'] = playlist.name;
         playlistDic['tracks'] = playlist.tracks;
+        playlistDic['images'] = playlist.images;
 
         playlists.push(playlistDic);
     }
@@ -102,6 +103,7 @@ async function getPlaylistsAndTracks(token, playlistData) {
     for (const playlist of playlistData) {
         const playlistName = playlist.name;
         const hrefValue = playlist.tracks.href;
+        const playlistImages = playlist.images;
 
         const options = {
             url: hrefValue,
@@ -120,10 +122,12 @@ async function getPlaylistsAndTracks(token, playlistData) {
 
             if (trackName) {
                 const artistsList = track.track.artists.map(artist => artist.name).filter(Boolean);
+                const trackImages = track.track.album.images;
 
                 const temp = {
                     track_name: trackName,
-                    artists: artistsList
+                    artists: artistsList,
+                    images: trackImages
                 };
                 playlistTracks.push(temp);
             }
@@ -132,6 +136,7 @@ async function getPlaylistsAndTracks(token, playlistData) {
         const temp = {
             playlist_name: playlistName,
             tracks: playlistTracks,
+            images: playlistImages,
             total: playlistTracks.length
         };
         playlistsTracksDetails.push(temp);
