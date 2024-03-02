@@ -12,7 +12,9 @@ export async function redirectToAuthCodeFlow(clientId) {
     params.append("client_id", clientId);
     params.append("response_type", "code");
     params.append("redirect_uri", "http://localhost:5173/callback");
-    params.append("scope", "user-read-private user-read-email");
+    params.append("scope", "user-read-private user-read-email user-read-recently-played" +
+        " user-library-read user-top-read playlist-modify-public playlist-modify-private playlist-read-private" +
+        " playlist-read-collaborative user-follow-modify ugc-image-upload");
     params.append("code_challenge_method", "S256");
     params.append("code_challenge", challenge);
 
@@ -83,13 +85,15 @@ export async function fetchUserPlaylist(token, userId) {
 
 function summarisePlaylistData(playlistData) {
     let playlists = []
-
+    console.log('playlist data: ', playlistData)
     for (const playlist of playlistData) {
         const playlistDic = {};
 
         playlistDic['name'] = playlist.name;
         playlistDic['tracks'] = playlist.tracks;
         playlistDic['images'] = playlist.images;
+        playlistDic['owner'] = playlist.owner.display_name;
+        playlistDic['type'] = playlist.public;
 
         playlists.push(playlistDic);
     }
@@ -104,6 +108,8 @@ async function getPlaylistsAndTracks(token, playlistData) {
         const playlistName = playlist.name;
         const hrefValue = playlist.tracks.href;
         const playlistImages = playlist.images;
+        const playlist_owner = playlist.owner;
+        const playlist_type = playlist.type;
 
         const options = {
             url: hrefValue,
@@ -137,7 +143,9 @@ async function getPlaylistsAndTracks(token, playlistData) {
             playlist_name: playlistName,
             tracks: playlistTracks,
             images: playlistImages,
-            total: playlistTracks.length
+            total: playlistTracks.length,
+            owner: playlist_owner,
+            type: playlist_type
         };
         playlistsTracksDetails.push(temp);
     }

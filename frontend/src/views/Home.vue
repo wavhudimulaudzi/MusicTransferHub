@@ -32,11 +32,33 @@ onMounted(async () => {
 </script>
 
 <template>
-  <NavBar :access-token="accessToken" :profile-data="profileData"/>
-  <HomeBody />
-  <Footer />
+  <NavBar class="navBar" :access-token="accessToken" :profile-data="profileData"/>
+  <HomeBody class="body" :playlists="playlistData"/>
+  <Footer class="footer"/>
 </template>
 
 <style scoped>
+.navBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
 
+.body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+}
 </style>

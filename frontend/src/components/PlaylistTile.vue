@@ -3,9 +3,10 @@ import Checkbox from "@/components/formFields/Checkbox.vue";
 
 const props = defineProps({
   title: String,
-  tracks: String,
+  tracks: Number,
   creator: String,
-  type: String
+  type: String,
+  imageSrc: String
 })
 </script>
 
@@ -13,7 +14,7 @@ const props = defineProps({
   <div class="playlistTile">
     <div class="blankSpace">
       <Checkbox />
-      <img src="../assets/jcole_album_cover.jpg" alt="Playlist Icon" class="playlistImage"/>
+      <img :src="imageSrc" alt="Playlist Icon" class="playlistImage"/>
     </div>
     <p class="title">{{ title }}</p>
     <div class="otherHeaders">
@@ -55,6 +56,10 @@ const props = defineProps({
   display: flex;
   justify-content: space-between;
   width: 40vw;
+}
+
+.otherHeaders p {
+  text-align: center;
 }
 
 .actions {
